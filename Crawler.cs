@@ -142,19 +142,22 @@ namespace SpaCrawler
                 "Crawl Summary\n" +
                 "-------------\n" +
                 "Seed Url: {0}\n" +
-                "Number Crawled Pages\n {1}",
+                "Number Crawled Pages {1}\n",
                 _settings.SeedUrl.ToString(),
                 _crawledPages.Count());
 
             uint linkNumber = 1;
             foreach(var page in _crawledPages)
             {
-                crawlSummary.Concat(string.Format("Crawled Link #{0}: Url={1}, Details={2}\n",
+                crawlSummary = crawlSummary + 
+                    string.Format("Crawled Link #{0}: Url={1}, Details={2}\n",
                     linkNumber,
                     page.Key,
-                    page.Value.Guid.ToString().Replace("-", "")));
+                    page.Value.Guid.ToString().Replace("-", ""));
                 linkNumber++;
             }
+
+            File.WriteAllText(Path.Join(_result.OutputDirectory.FullName, "Summary.txt"), crawlSummary);
         }
         private async Task UninitializeCrawl()
         {

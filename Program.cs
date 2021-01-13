@@ -95,33 +95,33 @@ namespace SpaCrawler
                         ShowHelp();
                         break;
                 }
+            }
 
-                Console.WriteLine("Command line arguments:");
-                Console.WriteLine(string.Format("seedUrl={0}", seedUrl));
-                Console.WriteLine(string.Format("depth={0}", depth));
-                Console.WriteLine(string.Format("outputDirectory={0}", outputDirectory));
-                Console.WriteLine(string.Format("headless={0}", headless ? "true" : "false"));
-                Console.WriteLine(string.Format("screenShots={0}", screenShots ? "true" : "false"));
-                Console.WriteLine(string.Format("dumpDom={0}", dumpDom ? "true" : "false"));
+            Console.WriteLine("Command line arguments:");
+            Console.WriteLine(string.Format("seedUrl={0}", seedUrl));
+            Console.WriteLine(string.Format("depth={0}", depth));
+            Console.WriteLine(string.Format("outputDirectory={0}", outputDirectory));
+            Console.WriteLine(string.Format("headless={0}", headless ? "true" : "false"));
+            Console.WriteLine(string.Format("screenShots={0}", screenShots ? "true" : "false"));
+            Console.WriteLine(string.Format("dumpDom={0}", dumpDom ? "true" : "false"));
 
-                try
-                {
-                    Crawler crawler = new Crawler();
-                    CrawlSettings crawlSettings = new CrawlSettings(new Uri(seedUrl), outputDirectory, depth, headless, screenShots, dumpDom);
-                    await crawler.RunAsync(crawlSettings);
+            try
+            {
+                Crawler crawler = new Crawler();
+                CrawlSettings crawlSettings = new CrawlSettings(new Uri(seedUrl), outputDirectory, depth, headless, screenShots, dumpDom);
+                await crawler.RunAsync(crawlSettings);
 
-                    Console.WriteLine(
-                        string.Format("Success: Crawl of {0} completed successfully - Report written to {1}",
-                        seedUrl,
-                        outputDirectory));
-                }
-                catch (ArgumentException e)
-                {
-                    Console.WriteLine(
-                        string.Format("Error: Crawl of {0} ended prematurley - Details: {1}",
-                        seedUrl,
-                        e.Message));
-                }
+                Console.WriteLine(
+                    string.Format("Success: Crawl of {0} completed successfully - Report written to {1}",
+                    seedUrl,
+                    outputDirectory));
+            }
+            catch (ArgumentException e)
+            {
+                Console.WriteLine(
+                    string.Format("Error: Crawl of {0} ended prematurley - Details: {1}",
+                    seedUrl,
+                    e.Message));
             }
         }
     }
