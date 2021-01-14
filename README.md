@@ -28,6 +28,11 @@ Each crawled link has a unique id associated with it. The Summary.txt file helps
 
 For each crawled page, the results folder will also be populated with a png screenshot and a html file containing the rendered DOM html (if ```--screenShots``` and ```--dumpDom``` have been specfied as a command line switches respectivley). These files are identified by thei unique link id, which can be refernced in the Summary.txt file.
 
+Examples:
+
+![Report Example](images/report_example_1.png)
+
+![Summary Example](images/summary_example_1.png)
 # Acknowledgements
 This project is written using PuppeteerSharp and is based on the crawlsite example provided in the official Node.JS Puppeteer API Examples repository as developed by Google. The crawlsite.js and further examples of how to use Puppeteer can be found here: https://github.com/puppeteer/examples
 
