@@ -21,6 +21,8 @@ namespace SpaCrawler
             Console.WriteLine(string.Format("\t{0,-30}\t{1}", "--headless", "Use headless browser."));
             Console.WriteLine(string.Format("\t{0,-30}\t{1}", "--outputDirectory <directory>", "Output directory of crawl results."));
             Console.WriteLine(string.Format("\t{0,-30}\t{1}", "--help", "Show this help page."));
+
+            Environment.Exit(0);
         }
         static async Task Main(string[] args)
         {
@@ -51,7 +53,6 @@ namespace SpaCrawler
                             args[i].StartsWith("--"))
                         {
                             ShowHelp("--seedUrl requires a valid url as an argument.");
-                            return;
                         }
                         seedUrl = args[i];
                         break;
@@ -63,18 +64,15 @@ namespace SpaCrawler
                             !uint.TryParse(args[i], out depth))
                         {
                             ShowHelp("--depth requires a valid unsigned integer as an argument.");
-                            return;
                         }
                         break;
 
                     case "--outputDirectory":
                         i++;
                         if (string.IsNullOrEmpty(args[i]) ||
-                            args[i].StartsWith("--") ||
-                            !Directory.Exists(args[i]))
+                            args[i].StartsWith("--"))
                         {
                             ShowHelp("--outputDirectory requires a valid directory as an argument.");
-                            return;
                         }
                         outputDirectory = args[i];
                         break;
@@ -95,6 +93,22 @@ namespace SpaCrawler
                         ShowHelp();
                         break;
                 }
+            }
+
+            if(seedUrl.Length == 0)
+            {
+                ShowHelp("--seedUrl requires a valid url as an argument.");
+                Environment.Exit(1);
+            }
+            else if(depth <= 0)
+            {
+                ShowHelp("--depth requires a valid unsigned integer as an argument.");
+                Environment.Exit(1);
+            }
+            else if(outputDirectory.Length == 0 || !Directory.Exists(outputDirectory))
+            {
+                ShowHelp("--outputDirectory requires a valid directory as an argument.");
+                Environment.Exit(1);
             }
 
             Console.WriteLine("Command line arguments:");
@@ -122,7 +136,11 @@ namespace SpaCrawler
                     string.Format("Error: Crawl of {0} ended prematurley - Details: {1}",
                     seedUrl,
                     e.Message));
+
+                Environment.Exit(1);
             }
+
+            Environment.Exit(0);
         }
     }
 }
