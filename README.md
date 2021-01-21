@@ -9,7 +9,7 @@ You can either download the latest release, or build from source using Visual St
 The compiled exe can be run as follows: ```SpaCrawler.exe [options]```
 
 # Configuration options
-The following command lie options may be passed:
+The following command line options may be passed:
 
 * ```--seedUrl <url>```:                  [required] The url to start the crawl from.
 * ```--depth <depth>```:                  [required] The maximum crawl depth relative to the seed url.
