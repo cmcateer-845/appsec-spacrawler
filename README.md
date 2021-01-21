@@ -37,3 +37,8 @@ Examples:
 This project is written using PuppeteerSharp and is based on the crawlsite example provided in the official Node.JS Puppeteer API Examples repository as developed by Google. The crawlsite.js and further examples of how to use Puppeteer can be found here: https://github.com/puppeteer/examples
 
 PuppeteerSharp is a .NET port of the official Node.JS Puppeteer API written by [Darío Kondratiuk](https://github.com/kblok). The Github repository for PuppeteerSharp can be found here: https://github.com/hardkoded/puppeteer-sharp and the official website containing useful API documentation is here: https://www.puppeteersharp.com/ 
+
+# Note
+Please be careful when crawling websites using this tool. We have not yet implemented "do not crawl" restrictions. Always seek permission from the website owner before crawling any website.
+
+The authors of appsec-spacrawler are not liable for any consequenes that occur due to users crawling sites they do not have permission for.
