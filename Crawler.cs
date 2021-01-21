@@ -163,6 +163,7 @@ namespace SpaCrawler
         {
             await _browser.CloseAsync();
         }
+
         public async Task RunAsync(CrawlSettings settings)
         {
             await InitializeCrawl(settings);
