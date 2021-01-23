@@ -105,19 +105,18 @@ namespace SpaCrawler
     }
     public class PlaybackActionLookup
     {
-        static Dictionary<string, PlaybackActionMeta> _mapping =
+        static public Dictionary<string, PlaybackActionMeta> _mapping =
             new Dictionary<string, PlaybackActionMeta>
             {
-                { "AddScriptTagAsync",  new PlaybackActionMeta(PlaybackActionEnum.AddScriptTagAsync, new Func<Page, string, Task<ElementHandle>>(async (Page page, string url) => { return await page.AddScriptTagAsync(url); }), new Type[] { typeof(string) }, typeof(Task<ElementHandle>)) },
-                { "AddStyleTagAsync",   new PlaybackActionMeta(PlaybackActionEnum.AddStyleTagAsync,  new Func<Page, string, Task<ElementHandle>>(async (Page page, string url) => { return await page.AddStyleTagAsync(url); }),  new Type[] { typeof(string) }, typeof(Task<ElementHandle>)) },
-                { "AuthenticateAsync",  new PlaybackActionMeta(PlaybackActionEnum.AuthenticateAsync, new Action<Page, Credentials>(async (Page page, Credentials creds) => { await page.AuthenticateAsync(creds); }), new Type[] { typeof(Credentials) }, typeof(Task)) },
+                { "AddScriptTagAsync", new PlaybackActionMeta(PlaybackActionEnum.AddScriptTagAsync, new Func<Page, string, Task<ElementHandle>>(async (Page page, string url) => { return await page.AddScriptTagAsync(url); }), new Type[] { typeof(string) }, typeof(Task<ElementHandle>)) },
+                { "AddStyleTagAsync", new PlaybackActionMeta(PlaybackActionEnum.AddStyleTagAsync,  new Func<Page, string, Task<ElementHandle>>(async (Page page, string url) => { return await page.AddStyleTagAsync(url); }),  new Type[] { typeof(string) }, typeof(Task<ElementHandle>)) },
+                { "AuthenticateAsync", new PlaybackActionMeta(PlaybackActionEnum.AuthenticateAsync, new Action<Page, Credentials>(async (Page page, Credentials creds) => { await page.AuthenticateAsync(creds); }), new Type[] { typeof(Credentials) }, typeof(Task)) },
                 { "BringToFrontAsync", new PlaybackActionMeta(PlaybackActionEnum.BringToFrontAsync, new Action<Page>(async (Page page) => { await page.BringToFrontAsync(); }), new Type[] { }, typeof(Task)) },
                 { "ClickAsync", new PlaybackActionMeta(PlaybackActionEnum.ClickAsync, new Action<Page, string, ClickOptions>(async (Page page, string selector, ClickOptions options) => { await page.ClickAsync(selector, options); }), new Type[] { typeof(string), typeof(ClickOptions) }, typeof(Task)) },
                 { "CloseAsync", new PlaybackActionMeta(PlaybackActionEnum.CloseAsync, new Action<Page, PageCloseOptions>(async (Page page, PageCloseOptions options) => { await page.CloseAsync(options); }), new Type[] { typeof(PageCloseOptions) }, typeof(Task)) },
                 { "DeleteCookieAsync", new PlaybackActionMeta(PlaybackActionEnum.DeleteCookieAsync, new Action<Page, CookieParam[]>(async (Page page, CookieParam[] cookies) => { await page.DeleteCookieAsync(cookies); }), new Type[] { typeof(CookieParam[]) }, typeof(Task)) },
                 { "Dispose", new PlaybackActionMeta(PlaybackActionEnum.Dispose, new Action<Page>((Page page) => { page.Dispose(); }), new Type[] { }, typeof(void)) },
                 { "DisposeAsync", new PlaybackActionMeta(PlaybackActionEnum.DisposeAsync, new Action<Page>(async (Page page) => { await page.DisposeAsync(); }), new Type[] { }, typeof(ValueTask)) },
-                { "EmulateAsync", new PlaybackActionMeta(PlaybackActionEnum.EmulateAsync, new Action<Page, DeviceDescriptor>(async (Page page, DeviceDescriptor descriptor) => { await page.EmulateAsync(descriptor); }), new Type[] { typeof(DeviceDescriptor) }, typeof(Task)) },
                 { "EmulateMediaAsync", new PlaybackActionMeta(PlaybackActionEnum.EmulateMediaAsync, new Action<Page, MediaType>(async (Page page, MediaType type) => { await page.EmulateMediaAsync(type); }), new Type[] { typeof(MediaType) }, typeof(Task)) },
                 { "EmulateMediaFeaturesAsync", new PlaybackActionMeta(PlaybackActionEnum.EmulateMediaFeaturesAsync, new Action<Page, IEnumerable<MediaFeatureValue>>(async (Page page, IEnumerable<MediaFeatureValue> features) => { await page.EmulateMediaFeaturesAsync(features); }), new Type[] { typeof(IEnumerable<MediaFeatureValue>) }, typeof(Task)) },
                 { "EmulateMediaTypeAsync", new PlaybackActionMeta(PlaybackActionEnum.EmulateMediaTypeAsync, new Action<Page, MediaType>(async (Page page, MediaType type) => { await page.EmulateMediaTypeAsync(type); }), new Type[] { typeof(MediaType) }, typeof(Task)) },
@@ -191,48 +190,63 @@ namespace SpaCrawler
                 { "XPathAsync", new PlaybackActionMeta(PlaybackActionEnum.XPathAsync, new Func<Page, string, Task<ElementHandle[]>>(async (Page page, string expression) => { return await page.XPathAsync(expression); }), new Type[] { typeof(string) }, typeof(Task<ElementHandle[]>)) }
             };
     }
+    public class PlaybackAction
+    {
+        public PlaybackActionMeta Metadata { get; }
+        public PlaybackActionEnum Type { get; }
+        public Delegate Method { get; }
+        public object[] Arguments { get; }
+        public object Return { get; }
+        private void Parse(string json)
+        {
+            if(JObject.Parse(json).Count > 1)
+            {
+
+            }
+        }
+        public PlaybackAction(PlaybackActionMeta meta, string json)
+        {
+            Metadata = meta;
+            Type = Metadata.Type;
+            Method = Metadata.Method;
+            Parse(json);
+        }
+    }
     public class PlaybackActionMeta
     {
-        private PlaybackActionEnum _type { get; set; }
-        private Delegate _method { get; set; }
-        private Type[] _argType { get; set; }
-        private Type _returnType { get; set; }
-        public PlaybackActionEnum Type { get => _type; }
-        public Delegate Method { get => _method; }
-        public Type[] ArgType { get => _argType; }
-        public Type ReturnType { get => _returnType; }
-        public PlaybackActionMeta(PlaybackActionEnum type, Delegate method, Type[] argType, Type returnType)
+        public PlaybackActionEnum Type { get; }
+        public Delegate Method { get; }
+        public Type[] ArgumentTypes { get; }
+        public Type ReturnType { get; }
+        public PlaybackActionMeta(PlaybackActionEnum type, Delegate method, Type[] argumentTypes, Type returnType)
         {
-            _type = type;
-            _method = method;
-            _argType = argType;
-            _returnType = returnType;
+            Type = type;
+            Method = method;
+            ArgumentTypes = argumentTypes;
+            ReturnType = returnType;
         }
         public PlaybackActionMeta(PlaybackActionEnum type, Delegate method)
         {
-            _type = type;
-            _method = method;
+            Type = type;
+            Method = method;
 
             // Use reflection to get the argument types and return type.
-            List<Type> argTypes = new List<Type>();
-            foreach(var argument in _method.GetMethodInfo().GetParameters())
+            List<Type> argumentTypes = new List<Type>();
+            foreach(var argument in Method.GetMethodInfo().GetParameters())
             {
-                argTypes.Add(argument.ParameterType);
+                argumentTypes.Add(argument.ParameterType);
             }
-            _argType = argTypes.ToArray();
+            ArgumentTypes = argumentTypes.ToArray();
 
-            _returnType = _method.GetMethodInfo().ReturnType;
+            ReturnType = Method.GetMethodInfo().ReturnType;
         }
     }
 
     public class PlaybackObject
     {
-        private Uri _url { get; set; }
-        private PlaybackType _type { get; set; }
-        private CrawlPlaybackAction[] _actions { get; set; }
-        public Uri Url { get => _url; }
-        public PlaybackType Type { get => _type; }
-        public CrawlPlaybackAction[] Actions { get => _actions; }
+        public Uri Url { get; }
+        public PlaybackType Type { get; }
+        //public CrawlPlaybackAction[] Actions { get; }
         public PlaybackObject(string json)
         {
 

@@ -1,10 +1,12 @@
-﻿using PuppeteerSharp;
+﻿using Newtonsoft.Json.Linq;
+using PuppeteerSharp;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace SpaCrawler
@@ -129,7 +131,7 @@ namespace SpaCrawler
             _browser = await Puppeteer.LaunchAsync(new LaunchOptions
             {
                 Headless = _settings.Headless,
-                DefaultViewport = new ViewPortOptions { Width = 0, Height = 0 },
+                DefaultViewport = new ViewPortOptions { Width = 1920, Height = 1080 },
                 Args = new string[] { "" }
             });
 
@@ -163,9 +165,54 @@ namespace SpaCrawler
         {
             await _browser.CloseAsync();
         }
-
         public async Task RunAsync(CrawlSettings settings)
         {
+            var example1 = @"{""name"": ""SetViewportAsync"", ""values"": [ {""Width"": 2560, ""Height"": 1440, ""IsMobile"": false, ""DeviceScaleFactor"": 1.0, ""IsLandscape"": false, ""HasTouch"": false } ] }";
+            var example2 = @"{""name"": ""XPathAsync"", ""values"" : [ ""some xpath"" ] }";
+            var example3 = @"{""name"": ""ClickAsync"", ""values"": [ ""some selector"", {""Delay"": 300, ""ClickCount"": 2, ""Button"": 1} ] }";
+            var example4 = @"{""name"": ""DeleteCookieAsync"", ""values"": [ [  { ""Name"": ""MyCookieName"", ""Value"": ""MyCookieValue"", ""Domain"": ""MyCookieDomain"", ""Url"": ""MyCookieUrl"", ""Path"": ""MyCookiePath"", ""Expires"": 6.2, ""Size"": 200, ""HttpOnly"": true, ""Secure"": true, ""Session"": false, ""SameSite"": 0 },
+                                                                                { ""Name"": ""MyCookieName2"", ""Value"": ""MyCookieValue2"", ""Domain"": ""MyCookieDomain2"", ""Url"": ""MyCookieUrl2"", ""Path"": ""MyCookiePath2"", ""Expires"": 6.2, ""Size"": 200, ""HttpOnly"": false, ""Secure"": false, ""Session"": true, ""SameSite"": 1 } ] ] }";
+            var example5 = @"{""name"": ""GoToAsyncWaitUntilNavigation"", ""values"": [ ""some url"", null, [ 0, 1, 2 ] ] }";
+            var example6 = @"{""name"": ""GoToAsyncTimeoutWaitUntilNavigation"", ""values"": [ ""http://localhost:3000/#/"", ""20"", [ 0, 1, 2 ] ] }";
+
+            var jsonObject = JObject.Parse(example3);
+
+            var varIdx = 0;
+            var parsedArguments = new List<object>();
+            foreach (var type in PlaybackActionLookup._mapping[jsonObject["name"].ToString()].ArgumentTypes)
+            {
+                dynamic parsedArgument;
+
+                // Check what type we have, if it is enumerable, e.g. Cookie[], then the whole
+                // value should be deserialized. If not, then we should loop through each value
+                // and deserialize.
+                if(type is null)
+                {
+                    parsedArguments.Add(null);
+                }
+                else
+                {
+                    if(type.Namespace == "System")
+                    {
+                        parsedArgument = jsonObject["values"][varIdx].ToObject(type);
+                    }
+                    else if(type.IsArray)
+                    {
+                        var someValue = jsonObject["values"][varIdx].ToString(); 
+                        parsedArgument = JsonSerializer.Deserialize(someValue, type);
+                    }
+                    else
+                    {
+                        var someValue = jsonObject["values"][varIdx].ToString(); 
+                        parsedArgument = JsonSerializer.Deserialize(someValue, type);
+                    }
+
+                    parsedArguments.Add(parsedArgument);
+                }
+
+                varIdx++;
+            }
+
             await InitializeCrawl(settings);
             await PerformCrawlAsync(_settings.SeedUrl.ToString());
             GenerateResults();
