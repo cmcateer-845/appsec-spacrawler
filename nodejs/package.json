@@ -24,6 +24,7 @@
     "enquirer": "^2.3.6",
     "fs": "^0.0.1-security",
     "puppeteer": "^5.5.0",
+    "sharp": "^0.27.1",
     "uuid": "^8.3.2",
     "valid-url": "^1.0.9"
   }

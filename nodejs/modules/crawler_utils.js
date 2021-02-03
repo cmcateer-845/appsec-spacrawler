@@ -27,20 +27,20 @@ function extractHrefsJs(sameOrigin = true) {
     return Array.from(new Set(filtered));
 }
 
-export async function extractHrefs(sameOrigin = true)
+export async function extractHrefs(page, sameOrigin = true)
 {
-    return await this.evaluate(extractHrefsJs(sameOrigin));
+    return await page.evaluate(extractHrefsJs);
 }
 
-export async function extractEventListeners() {
-    const client = await this.target().createCDPSession();
+export async function extractEventListeners(page) {
+    const client = await page.target().createCDPSession();
 
     const { result } = await client.send('Runtime.evaluate', { expression: 'document' });
     return await client.send('DOMDebugger.getEventListeners', { objectId: result.objectId });
 }
 
-export async function extractLocalStorage() {
-    const localStorageData = await this.evaluate(() => {
+export async function extractLocalStorage(page) {
+    const localStorageData = await page.evaluate(() => {
         let json = {};
         for(let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
@@ -51,8 +51,8 @@ export async function extractLocalStorage() {
     return localStorageData;
 }
 
-export async function extractSessionStorage() {
-    const sessionStorageData = await this.evaluate(() => {
+export async function extractSessionStorage(page) {
+    const sessionStorageData = await page.evaluate(() => {
         let json = {};
         for(let i = 0; i < sessionStorage.length; i++) {
             const key = sessionStorage.key(i);

@@ -21,9 +21,9 @@ export default class crawler_init {
         const settings = new crawler_settings(
              options["seedUrl"],
              options["depth"],
-             options["screenShots"],
              options["headless"],
-             options["domDump"]
+             options["screenShots"],
+             options["dumpDom"]
         );
     
         await new crawler().run(settings);
@@ -96,7 +96,7 @@ export default class crawler_init {
                 disabled: 'No'
             },
             {
-                name: 'domDump',
+                name: 'dumpDom',
                 type: 'toggle',
                 message: 'For each page, do you want to output a dump of the DOM?',
                 enabled: 'Yes',
