@@ -1,7 +1,33 @@
 import validUrl from 'valid-url';
 
 export default class crawler_settings {
-    #validate() {
+    private seedUrl: string
+    private maxDepth: number
+    private headless: boolean
+    private screenShots: boolean
+    private dumpDom: boolean
+
+    getSeedUrl() {
+        return this.seedUrl;
+    }
+
+    getMaxDepth() {
+        return this.maxDepth;
+    }
+
+    isHeadlessSet() {
+        return this.headless;
+    }
+
+    isScreenShotsSet() {
+        return this.screenShots;
+    }
+
+    isDumpDomSet() {
+        return this.dumpDom;
+    }
+
+    private validate() {
         if(this.seedUrl === undefined || !this.seedUrl.length || !validUrl.isUri(this.seedUrl)) {
             console.log(`Error: Seed URL is not valid. Cancelling crawl.`);
             process.exit(1);
@@ -13,7 +39,7 @@ export default class crawler_settings {
         }
     }
 
-    constructor(seedUrl,
+    constructor(seedUrl: string,
         maxDepth = 2,
         headless = false,
         screenShots = false,
@@ -24,6 +50,6 @@ export default class crawler_settings {
             this.screenShots = screenShots;
             this.dumpDom = dumpDom;
 
-            this.#validate();
+            this.validate();
     }
 }
