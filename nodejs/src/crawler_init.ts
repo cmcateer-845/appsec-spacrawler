@@ -1,8 +1,6 @@
-import args from 'commander';
 import validUrl from 'valid-url';
 import enquirer from 'enquirer';
 import asciiart from 'asciiart-logo';
-import chalk from 'chalk';
 import commander from 'commander';
 const program = commander.program;
 
@@ -11,11 +9,11 @@ import crawler_settings from './crawler_settings.js';
 
 export default class crawler_init {
     constructor() {
-        this.#init();
+        this.initialize();
     }
 
-    async #init() {
-        const options = await this.#parseCommandLineArguments();
+    private async initialize() {
+        const options = await this.parseCommandLineArguments();
         console.log(options);
     
         const settings = new crawler_settings(
@@ -29,13 +27,13 @@ export default class crawler_init {
         await new crawler().run(settings);
     }
 
-    async #parseCommandLineArguments() {
+    private async parseCommandLineArguments() {
         program.addHelpText('beforeAll', `Example call: $ appsec-spacrawler --help`);
     
         program
             .option('--interactive', 'use interactive mode to configure the crawl.', false)
             .option('--seedUrl <url>', 'url to start crawling from.')
-            .option('--depth <depth>', 'maximum crawl depth.', 2)
+            .option('--depth <depth>', 'maximum crawl depth.', "2")
             .option('--screenShots', 'take a screenshot of each page visited.', false)
             .option('--dumpDom', 'dump the document object model of each page visted.', false)
             .option('--headless', 'use the headless browser.', false)
@@ -48,20 +46,20 @@ export default class crawler_init {
     
         if(options.interactive !== false)
         {
-            await this.#renderLogo();
-            return await this.#interactiveCommandPrompt();
+            await this.renderLogo();
+            return await this.interactiveCommandPrompt();
         }
     
         return options;
     }
 
-    async #interactiveCommandPrompt() {
+    private async interactiveCommandPrompt() {
         const menu = [
             {
                 name: 'seedUrl',
                 type: 'input',
                 message: 'Where do you want to start crawling from?',
-                validate: function(value) {
+                validate: function(value: string) {
                     if(!value.length || !validUrl.isUri(value))
                     {
                         return "Please enter a valid url to crawl from.";
@@ -73,8 +71,8 @@ export default class crawler_init {
                 name: 'depth',
                 type: 'input',
                 message: 'How deep do you want the crawl to go?',
-                validate: function(value) {
-                    if(!value > 0)
+                validate: function(value: number) {
+                    if(!(value > 0))
                     {
                         return "Please enter a valid depth to crawl from.";
                     }
@@ -106,7 +104,7 @@ export default class crawler_init {
         return enquirer.prompt(menu);
     }
     
-    async #renderLogo() {
+    private async renderLogo() {
         const colorChoices = [
             'magenta',
             'cyan',

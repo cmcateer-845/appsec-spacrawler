@@ -2,10 +2,12 @@
   "name": "appsec-spacrawler",
   "version": "1.0.0",
   "description": "A simple web crawler, capable of crawling SPA sites using Puppeteer - simply pass a url to start from, and watch it crawl.",
-  "main": "index.mjs",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build-ts": "tsc",
+    "watch-ts": "tsc -w"
   },
   "keywords": [
     "scraper",
@@ -16,6 +18,13 @@
   "author": "Conor McAteer",
   "license": "MIT",
   "dependencies": {
+    "@types/chalk": "^2.2.0",
+    "@types/commander": "^2.12.2",
+    "@types/date-and-time": "^0.13.0",
+    "@types/node": "^14.14.25",
+    "@types/sharp": "^0.27.1",
+    "@types/uuid": "^8.3.0",
+    "@types/valid-url": "^1.0.3",
     "asciiart-logo": "^0.2.6",
     "babel": "^6.23.0",
     "chalk": "^2.4.2",
@@ -27,5 +36,9 @@
     "sharp": "^0.27.1",
     "uuid": "^8.3.2",
     "valid-url": "^1.0.9"
+  },
+  "devDependencies": {
+    "@types/puppeteer": "^5.4.3",
+    "typescript": "^4.1.3"
   }
 }
