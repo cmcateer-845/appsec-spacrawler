@@ -17,7 +17,7 @@ export default class crawler {
         this.settings = settings;
         this.browser = await puppeteer.launch({
             headless: this.settings.isHeadlessSet(),
-            defaultViewport: { width: 0, height: 0},
+            defaultViewport: { width: 0, height: 0 },
             args: []
         });
         this.result = new crawler_result(this.settings.getSeedUrl());

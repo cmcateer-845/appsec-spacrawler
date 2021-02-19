@@ -8,33 +8,45 @@ namespace SpaCrawler
 {
     internal class CrawlResult
     {
-        private DirectoryInfo _outputDirectory { get; set; }
-        private uint _numberCrawledPages { get; set; }
-        private HashSet<Page> _crawledPages { get; set; } 
-        public DirectoryInfo OutputDirectory { get => _outputDirectory; }
-        public uint NumberCrawledPages
-        {
-            get => _numberCrawledPages;
-            set { if (value > 0) { _numberCrawledPages = value; } }
-        }
-        public HashSet<Page> CrawledPages
-        {
-            get => _crawledPages;
-            set => _crawledPages = value;
-        }
-        public CrawlResult(string outputBaseDirectoryStr)
-        {
-            Directory.CreateDirectory(outputBaseDirectoryStr);
-            DirectoryInfo outputBaseDirectory = new DirectoryInfo(outputBaseDirectoryStr);
-            _outputDirectory = outputBaseDirectory
-                .CreateSubdirectory(DateTime.Now.ToString("yyyy-dd-M-HH-mm-ss"));
-        }
-        public CrawlResult(DirectoryInfo outputBaseDirectory)
-        {
-            Directory.CreateDirectory(outputBaseDirectory.FullName);
-            _outputDirectory = outputBaseDirectory
-                .CreateSubdirectory(DateTime.Now.ToString("yyyy-dd-M-HH-mm-ss"));
-        }
+        public Uri SeedUrl { get; }
+        public DirectoryInfo OutputFolder { get; private set; }
+        public Dictionary<string, CrawlPage> CrawledPages { get; }
 
+        public void WriteResults()
+        {
+            string crawlSummary = string.Format(
+                "Crawl Summary\n" +
+                "-------------\n" +
+                "Seed Url: {0}\n" +
+                "Number Crawled Pages {1}\n",
+                SeedUrl.ToString(),
+                CrawledPages.Count);
+
+            uint linkNumber = 1;
+            foreach(var page in CrawledPages)
+            {
+                crawlSummary = crawlSummary + 
+                    string.Format("Crawled Link #{0}: Url={1}, Details={2}\n",
+                    linkNumber,
+                    page.Key,
+                    page.Value.Guid.ToString().Replace("-", ""));
+                linkNumber++;
+            }
+
+            File.WriteAllText(Path.Join(OutputFolder.FullName, "Summary.txt"), crawlSummary);
+        }
+        private void GenerateResultsDirectory()
+        {
+            Directory.CreateDirectory(@"results");
+            DirectoryInfo outputBaseDirectory = new DirectoryInfo(@"results");
+            OutputFolder = outputBaseDirectory
+                .CreateSubdirectory(DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss"));
+        }
+        public CrawlResult(string seedUrl)
+        {
+            SeedUrl = new Uri(seedUrl);
+            CrawledPages = new Dictionary<string, CrawlPage>();
+            GenerateResultsDirectory();
+        }
     }
 }

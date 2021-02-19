@@ -65,7 +65,7 @@ export default class crawler_result {
     private generateResultsDirectory()
     {
         const now = new Date();
-        const baseFolder = fs.realpathSync("../results");
+        const baseFolder = fs.realpathSync("results");
         this.outputFolder = path.join(baseFolder, date.format(now, 'YYYY-MM-DD-HH-mm-ss'));
 
         try {
